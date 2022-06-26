@@ -29,7 +29,7 @@ public struct BitBoardMap
 
     public ulong ZobristHash;
 
-    public int PieceDevelopmentEvaluation;
+    public int MaterialDevelopmentEvaluation;
 
     public BitBoardMap(string boardFen, string turnData, string castlingData, string enPassantTargetData)
     {
@@ -138,12 +138,12 @@ public struct BitBoardMap
                 Bb[(int)PieceColor.Black][(int)Piece.Knight] | Bb[(int)PieceColor.Black][(int)Piece.Bishop] | 
                 Bb[(int)PieceColor.Black][(int)Piece.Queen] | Bb[(int)PieceColor.Black][(int)Piece.King];
 
-        PieceDevelopmentEvaluation = 0;
+        MaterialDevelopmentEvaluation = 0;
         
         // Necessary to do two assignments to acknowledge struct is fully initialized.
         ZobristHash = 0;
         ZobristHash = Zobrist.Hash(ref this);
-        PieceDevelopmentEvaluation = Evaluation.InitialPieceDevelopmentEvaluation(ref this);
+        MaterialDevelopmentEvaluation = Evaluation.InitialMaterialDevelopmentEvaluation(ref this);
     }
 
     // ReSharper disable once SuggestBaseTypeForParameterInConstructor
@@ -168,7 +168,7 @@ public struct BitBoardMap
         Array.Copy(piecesAndColors, PiecesAndColors, 64);
         
         ZobristHash = map.ZobristHash;
-        PieceDevelopmentEvaluation = map.PieceDevelopmentEvaluation;
+        MaterialDevelopmentEvaluation = map.MaterialDevelopmentEvaluation;
     }
 
     public (Piece, PieceColor) this[Square sq]
@@ -220,10 +220,10 @@ public struct BitBoardMap
             // Remove from color bitboards.
             if (cT == PieceColor.White) {
                 White[to] = false;
-                PieceDevelopmentEvaluation -= Evaluation.PieceDevelopmentTable[pT, (Square)((int)to ^ 56)];
+                MaterialDevelopmentEvaluation -= Evaluation.MaterialDevelopmentTable[pT, (Square)((int)to ^ 56)];
             } else {
                 Black[to] = false;
-                PieceDevelopmentEvaluation += Evaluation.PieceDevelopmentTable[pT, to];
+                MaterialDevelopmentEvaluation += Evaluation.MaterialDevelopmentTable[pT, to];
             }
             
             // Update Zobrist.
@@ -246,13 +246,13 @@ public struct BitBoardMap
         if (cF == PieceColor.White) {
             White[from] = false;
             White[to] = true;
-            PieceDevelopmentEvaluation -= Evaluation.PieceDevelopmentTable[pF, (Square)((int)from ^ 56)];
-            PieceDevelopmentEvaluation += Evaluation.PieceDevelopmentTable[pF, (Square)((int)to ^ 56)];
+            MaterialDevelopmentEvaluation -= Evaluation.MaterialDevelopmentTable[pF, (Square)((int)from ^ 56)];
+            MaterialDevelopmentEvaluation += Evaluation.MaterialDevelopmentTable[pF, (Square)((int)to ^ 56)];
         } else {
             Black[from] = false;
             Black[to] = true;
-            PieceDevelopmentEvaluation += Evaluation.PieceDevelopmentTable[pF, from];
-            PieceDevelopmentEvaluation -= Evaluation.PieceDevelopmentTable[pF, to];
+            MaterialDevelopmentEvaluation += Evaluation.MaterialDevelopmentTable[pF, from];
+            MaterialDevelopmentEvaluation -= Evaluation.MaterialDevelopmentTable[pF, to];
         }
         
         // Update Zobrist.
@@ -279,10 +279,10 @@ public struct BitBoardMap
         // Remove from color bitboards.
         if (color == PieceColor.White) {
             White[sq] = false;
-            PieceDevelopmentEvaluation -= Evaluation.PieceDevelopmentTable[piece, (Square)((int)sq ^ 56)];
+            MaterialDevelopmentEvaluation -= Evaluation.MaterialDevelopmentTable[piece, (Square)((int)sq ^ 56)];
         } else {
             Black[sq] = false;
-            PieceDevelopmentEvaluation += Evaluation.PieceDevelopmentTable[piece, sq];
+            MaterialDevelopmentEvaluation += Evaluation.MaterialDevelopmentTable[piece, sq];
         }
         
         // Update Zobrist.
@@ -298,10 +298,10 @@ public struct BitBoardMap
         // Insert into color bitboards.
         if (color == PieceColor.White) {
             White[sq] = true;
-            PieceDevelopmentEvaluation += Evaluation.PieceDevelopmentTable[piece, (Square)((int)sq ^ 56)];
+            MaterialDevelopmentEvaluation += Evaluation.MaterialDevelopmentTable[piece, (Square)((int)sq ^ 56)];
         } else {
             Black[sq] = true;
-            PieceDevelopmentEvaluation -= Evaluation.PieceDevelopmentTable[piece, sq];
+            MaterialDevelopmentEvaluation -= Evaluation.MaterialDevelopmentTable[piece, sq];
         }
             
         // Set piece in pieces and colors.

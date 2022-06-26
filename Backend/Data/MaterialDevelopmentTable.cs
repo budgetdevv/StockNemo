@@ -1,9 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
 using Backend.Data.Enum;
+using Backend.Engine;
 
 namespace Backend.Data;
 
-public class PieceDevelopmentTable
+public class MaterialDevelopmentTable
 {
 
     private static readonly int[] Internal = {
@@ -85,6 +86,15 @@ public class PieceDevelopmentTable
 
         #endregion
     };
+
+    static MaterialDevelopmentTable()
+    {
+        // Add material values to development table.
+        for (int i = 0; i < 64; i++) Internal[i] += Evaluation.PAWN;
+        for (int i = 64; i < 128; i++) Internal[i] += Evaluation.ROOK;
+        for (int i = 128; i < 256; i++) Internal[i] += Evaluation.BISHOP_KNIGHT;
+        for (int i = 256; i < 320; i++) Internal[i] += Evaluation.QUEEN;
+    }
 
     public int this[Piece piece, Square sq]
     {
